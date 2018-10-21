@@ -1,7 +1,13 @@
 %{
 #include "exam2.h"
+extern int num_lines;
+int ntemp = 0;
+int mquad = 0;
+int yyerror(char *);
+int yylex();
+char * newtemp (void);
+void emit(char *op, char *arg1, char *arg2, char *res);
 %}
-
 
 %union
 {
@@ -9,30 +15,31 @@
   char t;
 }
 
-%token <typeexpr> HEXCONST BINCONST IDENTIFIER
+%token <typeexpr> HEXCONST 
+%token <typeexpr> BINCONST 
+%token <typeexpr> IDENTIFIER
 %token <t> BIN HEX
 %type <typeexpr> expr
-%type <typeexpr> term
-%type <typeexpr> fact
 %type <typeexpr> decll
 %type <t> type
 
 //operator precedence
+%left '='
 %left '+' '#'
 %left '*' '&'
-%right '!'
+%left '!'
 
 
 %%
-prog : decll instrBlock {printf("The type of the result is: %c\n",$2.type);};
+prog : decll instrBlock {};
 
 decll : decll decl {}
       | decl {};
 
-decl : type IDENTIFIER ';' { if(!find($2))
+decl : type IDENTIFIER ';' { if(!find($2.place))
                               {
-                                place = lookup($2); 
-                                place -> type = $1;
+                                looked = lookup($2.place); 
+                                looked -> type = $1;
                               }
                               else
                               {
@@ -43,8 +50,8 @@ decl : type IDENTIFIER ';' { if(!find($2))
                             }
             ;
 
-type : BIN {$$ = 'B'}
-     | HEX {$$ = 'H'}
+type : BIN {$$ = 'B';}
+     | HEX {$$ = 'H';}
      ;
 
 instrBlock : '{' assignInstructionList '}' {} ;
@@ -71,16 +78,14 @@ expr       : expr '*' expr  { if($1.type == $3.type) $$.type = $1.type;
                               else                   yyerror("Incompatible types");
                               $$.place = strdup(newtemp()); 
                               emit("xor", $1.place, $3.place, $$.place);}
-           | '!'' expr      { if($1.type == $3.type) $$.type = $1.type;
-                              else                   yyerror("Incompatible types");
+           | '!' expr       { $$.type = $2.type;
                               $$.place = strdup(newtemp()); 
-                              emit("not", $1.place, $3.place, $$.place);}
-           | '(' expr ')'   { $$.type = $1.type;
-                              $$.place = $2.place;
-                              emit("nand", $1.place, $3.place, $$.place);}
+                              emit("not", $2.place, "", $$.place);}
+           | '(' expr ')'   { $$.type = $2.type;
+                              $$.place = $2.place;}
            | IDENTIFIER     {if(find($1.place)) {
-                                place=lookup($1.place); 
-                                $$.type=place->type;
+                                looked=lookup($1.place); 
+                                $$.type=looked->type;
                                 $$.place=$1.place;
                              }
                              else {

@@ -483,8 +483,10 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "exam2.l"
 #line 2 "exam2.l"
+#include "exam2.h"
+#include "exam2.tab.h"
 int num_lines = 1;
-#line 488 "lex.yy.c"
+#line 490 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -702,9 +704,9 @@ YY_DECL
 		}
 
 	{
-#line 5 "exam2.l"
+#line 7 "exam2.l"
 
-#line 708 "lex.yy.c"
+#line 710 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -763,60 +765,60 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 6 "exam2.l"
+#line 8 "exam2.l"
 {}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 7 "exam2.l"
-{printf("BIN\n");}
+#line 9 "exam2.l"
+{printf("BIN\n"); yylval.t = 'B'; return(BIN);}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 8 "exam2.l"
-{printf("HEX\n");}
+#line 10 "exam2.l"
+{printf("HEX\n"); yylval.t = 'H'; return(HEX);}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 9 "exam2.l"
-{printf("Bin value: %s\n", strdup(yytext));}
+#line 11 "exam2.l"
+{printf("Bin value: %s\n", strdup(yytext)); yylval.typeexpr.place = strdup(yytext); return(BINCONST);}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 10 "exam2.l"
-{printf("Hex value: %s\n", strdup(yytext));}
+#line 12 "exam2.l"
+{printf("Hex value: %s\n", strdup(yytext)); yylval.typeexpr.place = strdup(yytext); return(HEXCONST);}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 11 "exam2.l"
-{printf("Operator: %s\n", strdup(yytext));}	
+#line 13 "exam2.l"
+{printf("Operator: %s\n", strdup(yytext)); return(yytext[0]);}	
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 12 "exam2.l"
-{printf("Identifier: %s\n", strdup(yytext));}	
+#line 14 "exam2.l"
+{printf("Identifier: %s\n", strdup(yytext)); yylval.typeexpr.place = strdup(yytext); return(IDENTIFIER);}	
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 13 "exam2.l"
+#line 15 "exam2.l"
 {++num_lines;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 14 "exam2.l"
+#line 16 "exam2.l"
 {return 0;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 15 "exam2.l"
+#line 17 "exam2.l"
 {printf("\nERROR: Illegal token: %s ",yytext); printf("at line %d\n",num_lines);}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 16 "exam2.l"
+#line 18 "exam2.l"
 ECHO;
 	YY_BREAK
-#line 820 "lex.yy.c"
+#line 822 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1815,6 +1817,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 16 "exam2.l"
+#line 18 "exam2.l"
+
 
 
