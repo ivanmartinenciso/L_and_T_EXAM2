@@ -1,6 +1,8 @@
-bin foobar;
-bin foobin;
-hex foohex;
+bin numBin;
+bin numBin2;
+hex numHex;
+hex numHex2;
+
 {
 foobar = 01100110;
 foobin = 11111111;

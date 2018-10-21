@@ -1,0 +1,22 @@
+bin numBin;
+bin numBin2;
+hex numHex;
+hex numHex2;
+
+bin numBin3;
+hex numHex3;
+{
+numBin = 01100110;
+numBin2 = 11111111;
+
+numHex = 0x3F;
+numHex2 = 0xa9;
+
+
+
+numBin3 = numBin & !numBin2;
+numBin2 = numBin3 & (numBin & 11110000) + numBin2;
+
+
+numHex3 = !numHex # 0x34 & numHex2;
+}
