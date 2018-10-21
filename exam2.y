@@ -6,19 +6,16 @@
 %union
 {
   struct example typeexpr;
-	double d;
-	char *s;
   char t;
 }
 
-%token <d> INTCONST DOUCONST
-%token <s> IDENT
+%token <typeexpr> HEXCONST BINCONST IDENTIFIER
 %token <t> BIN HEX
 %type <typeexpr> expr
 %type <typeexpr> term
 %type <typeexpr> fact
 %type <typeexpr> decll
-%type <t> Type
+%type <t> type
 
 //operator precedence
 %left '+' '#'
@@ -27,67 +24,74 @@
 
 
 %%
-Program : Declaration* InstructionBlock 
-        ;
+prog : decll instrBlock {printf("The type of the result is: %c\n",$2.type);};
 
-Declaration : Type IDENT ';' { if(!find($2))
+decll : decll decl {}
+      | decl {};
+
+decl : type IDENTIFIER ';' { if(!find($2))
                               {
                                 place = lookup($2); 
                                 place -> type = $1;
                               }
                               else
                               {
-                                printf("Error: Redeclaration of identifier: %s\n", $2);
+                                printf("Duplicated declaration: %s\n", $2.place);
+                                yyerror("Duplicated declaration");
+                                exit(0);
                               } 
                             }
             ;
 
-Type : BIN {$$ = 'B'}
+type : BIN {$$ = 'B'}
      | HEX {$$ = 'H'}
      ;
 
-InstructionBlock : '{' AssignInstruction* '}'
-                 | 
-                 ;
+instrBlock : '{' assignInstructionList '}' {} ;
 
-AssignInstruction : IDENT '=' Expression ';'
+assignInstructionList : assignInstructionList assignInstruction {}
+                      | assignInstruction {} ;
+
+assignInstruction : IDENTIFIER '=' expr ';' {emit("=", $3.place, "" , $1.place);}
                   ;
 
-Expression : Expression * Expression 
-           | Expression + Expression 
-           | Expression & Expression 
-           | Expression # Expression
-           | ! Expression # Expression
-start : decll expr {printf("El tipo del resultado es: %c\n",$2.type);}
-      ;
-
-decll : decll decl 
-	| decl {}
-	;
-decl : tipo IDENT ';' {if(!find($2)) {place=lookup($2); place->type=$1;}
-                       else {printf("Decl duplicada del identificador %s\n", $2);
-                             } }
-
-tipo : DOUBLE {$$ ='D';} 
-     | INT {$$ = 'I';}
-     ;
-
-expr : expr '+' term {if($1.type == $3.type) $$.type = $1.type;
-			else yyerror("tipos incompatibles");}
-     | term {$$.type = $1.type;}
-     ;
-
-term : term '*' fact {if($1.type == $3.type) $$.type = $1.type;
-			else yyerror("tipos incompatibles");}
-     | fact {$$.type = $1.type;}
-     ;
-
-fact : '(' expr ')' {$$.type = $2.type;}
-     | INTCONST {$$.type = 'I';}
-     | DOUCONST {$$.type = 'D';} 
-     | IDENT {if(find($1)) {place=lookup($1); $$.type=place->type;}
-                       else {printf("Identificador no declarado %s\n", $1); }}
-     ;
+expr       : expr '*' expr  { if($1.type == $3.type) $$.type = $1.type;
+                              else                   yyerror("Incompatible types");
+                              $$.place = strdup(newtemp()); 
+                              emit("and", $1.place, $3.place, $$.place);}
+           | expr '+' expr  { if($1.type == $3.type) $$.type = $1.type;
+                              else                   yyerror("Incompatible types");
+                              $$.place = strdup(newtemp()); 
+                              emit("or", $1.place, $3.place, $$.place);}
+           | expr '&' expr  { if($1.type == $3.type) $$.type = $1.type;
+                              else                   yyerror("Incompatible types");
+                              $$.place = strdup(newtemp()); 
+                              emit("nand", $1.place, $3.place, $$.place);}
+           | expr '#' expr  { if($1.type == $3.type) $$.type = $1.type;
+                              else                   yyerror("Incompatible types");
+                              $$.place = strdup(newtemp()); 
+                              emit("xor", $1.place, $3.place, $$.place);}
+           | '!'' expr      { if($1.type == $3.type) $$.type = $1.type;
+                              else                   yyerror("Incompatible types");
+                              $$.place = strdup(newtemp()); 
+                              emit("not", $1.place, $3.place, $$.place);}
+           | '(' expr ')'   { $$.type = $1.type;
+                              $$.place = $2.place;
+                              emit("nand", $1.place, $3.place, $$.place);}
+           | IDENTIFIER     {if(find($1.place)) {
+                                place=lookup($1.place); 
+                                $$.type=place->type;
+                                $$.place=$1.place;
+                             }
+                             else {
+                                printf("Identifier not found: %s\n", $1.place); 
+                                yyerror("Variable was never declared");
+                                exit(0);
+                             }
+                            }
+           | BINCONST       {$$.type = 'B'; $$.place=$1.place;}
+           | HEXCONST       {$$.type = 'H'; $$.place=$1.place;}
+           ;
 %%
 
 static unsigned
@@ -122,7 +126,7 @@ lookup(char* sym)
 
     if(++sp >= symtab+NHASH) sp = symtab; /* try the next entry */
   }
-  fputs("symbol table overflow\n", stderr);
+  fputs("Symbol table overflow\n", stderr);
   abort(); /* tried them all, table is full */
 
 }
@@ -139,15 +143,33 @@ char find (char* sym)
 
 }
 
-int main(int argc, char **argv)
-{
-yyparse();
-printf("Accepted expression. \n");
+char * newtemp (void){
+  char temp[10];
+  sprintf(temp,"t%d",ntemp++);
+  return strdup(temp);
 }
 
-int yyerror(char *s)
-{
-fprintf(stderr,"Error: %s at line %d\n", s, num_lines);
-exit(0);
+void emit(char *op, char *arg1, char *arg2, char *res){
+  quadtab[mquad].op=strdup(op);
+  quadtab[mquad].arg1=strdup(arg1);
+  quadtab[mquad].arg2=strdup(arg2);
+  quadtab[mquad].res=strdup(res);
+  mquad++;
+}
+
+int main(int argc, char **argv){
+  yyparse();
+  printf("Accepted expression. \n");
+
+  printf("Intermediate code: \n");
+  for(int i=0;i<mquad;i++){
+    printf("%s %s %s %s \n",quadtab[i].op, quadtab[i].arg1,quadtab[i].arg2, quadtab[i].res);
+  }
+
+}
+
+int yyerror(char *s){
+  fprintf(stderr,"Error: %s at line %d\n", s, num_lines);
+  exit(0);
 }
 
