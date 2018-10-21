@@ -1252,8 +1252,8 @@ yyreduce:
 #line 39 "exam2.y" /* yacc.c:1646  */
     { if(!find((yyvsp[-1].typeexpr).place))
                               {
-                                looked = lookup((yyvsp[-1].typeexpr).place); 
-                                looked -> type = (yyvsp[-2].t);
+                                place = lookup((yyvsp[-1].typeexpr).place); 
+                                place -> type = (yyvsp[-2].t);
                               }
                               else
                               {
@@ -1355,8 +1355,8 @@ yyreduce:
   case 18:
 #line 86 "exam2.y" /* yacc.c:1646  */
     {if(find((yyvsp[0].typeexpr).place)) {
-                                looked=lookup((yyvsp[0].typeexpr).place); 
-                                (yyval.typeexpr).type=looked->type;
+                                place=lookup((yyvsp[0].typeexpr).place); 
+                                (yyval.typeexpr).type=place->type;
                                 (yyval.typeexpr).place=(yyvsp[0].typeexpr).place;
                              }
                              else {

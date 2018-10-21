@@ -771,32 +771,32 @@ YY_RULE_SETUP
 case 2:
 YY_RULE_SETUP
 #line 9 "exam2.l"
-{printf("BIN\n"); yylval.t = 'B'; return(BIN);}
+{yylval.t = 'B'; return(BIN);}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 10 "exam2.l"
-{printf("HEX\n"); yylval.t = 'H'; return(HEX);}
+{yylval.t = 'H'; return(HEX);}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 11 "exam2.l"
-{printf("Bin value: %s\n", strdup(yytext)); yylval.typeexpr.place = strdup(yytext); return(BINCONST);}
+{yylval.typeexpr.place = strdup(yytext); return(BINCONST);}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 12 "exam2.l"
-{printf("Hex value: %s\n", strdup(yytext)); yylval.typeexpr.place = strdup(yytext); return(HEXCONST);}
+{yylval.typeexpr.place = strdup(yytext); return(HEXCONST);}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 13 "exam2.l"
-{printf("Operator: %s\n", strdup(yytext)); return(yytext[0]);}	
+{return(yytext[0]);}	
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 14 "exam2.l"
-{printf("Identifier: %s\n", strdup(yytext)); yylval.typeexpr.place = strdup(yytext); return(IDENTIFIER);}	
+{yylval.typeexpr.place = strdup(yytext); return(IDENTIFIER);}	
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
@@ -811,7 +811,7 @@ case YY_STATE_EOF(INITIAL):
 case 9:
 YY_RULE_SETUP
 #line 17 "exam2.l"
-{printf("\nERROR: Illegal token: %s ",yytext); printf("at line %d\n",num_lines);}
+{printf("at line %d\n",num_lines);}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP

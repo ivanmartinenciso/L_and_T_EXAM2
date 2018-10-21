@@ -38,8 +38,8 @@ decll : decll decl {}
 
 decl : type IDENTIFIER ';' { if(!find($2.place))
                               {
-                                looked = lookup($2.place); 
-                                looked -> type = $1;
+                                place = lookup($2.place); 
+                                place -> type = $1;
                               }
                               else
                               {
@@ -84,8 +84,8 @@ expr       : expr '*' expr  { if($1.type == $3.type) $$.type = $1.type;
            | '(' expr ')'   { $$.type = $2.type;
                               $$.place = $2.place;}
            | IDENTIFIER     {if(find($1.place)) {
-                                looked=lookup($1.place); 
-                                $$.type=looked->type;
+                                place=lookup($1.place); 
+                                $$.type=place->type;
                                 $$.place=$1.place;
                              }
                              else {

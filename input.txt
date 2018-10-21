@@ -1,0 +1,15 @@
+bin foobar;
+bin foobin;
+hex foohex;
+{
+foobar = 01100110;
+foobin = 11111111;
+
+foohex = 0x3F;
+foohex = 0xa9;
+foohex = 0x20;
+foobar = foobin # !foobin;
+foobin = foobar & (foobar & 11110000) + foobar;
+
+foohex = !foohex # 0x34;
+}
