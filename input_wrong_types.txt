@@ -1,0 +1,16 @@
+bin numBin;
+bin numBin2;
+hex numHex;
+
+
+{
+numBin = 01100110;
+
+numHex = 0x3F;
+
+numBin2 = numBin # numBin;
+
+numBin2 = numBin # numHex;
+
+
+}
