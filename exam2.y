@@ -154,7 +154,8 @@ char * newtemp (void){
   return strdup(temp);
 }
 
-void emit(char *op, char *arg1, char *arg2, char *res){
+void emit(char *op, char *arg1, char *arg2, char *res)
+{
   quadtab[mquad].op=strdup(op);
   quadtab[mquad].arg1=strdup(arg1);
   quadtab[mquad].arg2=strdup(arg2);
